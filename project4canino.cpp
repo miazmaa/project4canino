@@ -12,15 +12,14 @@ int main(void)
 {
 	const int WIDTH = 900;
 	const int HEIGHT = 480;
-	bool keys[] = { false, false, false, false, false };
-	enum KEYS { UP, DOWN, LEFT, RIGHT, SPACE };
+	bool keys[] = { false, false, false, false };
+	enum KEYS { UP, DOWN, LEFT, RIGHT };
 	//variables
 	bool done = false;
 	bool render = false;
+	int dir = -1;
 	//Player Variable
 	Sprite player;
-	const int JUMPIT = 1600;
-	int jump = JUMPIT;
 
 
 
@@ -47,7 +46,7 @@ int main(void)
 
 	int xOff = 0;
 	int yOff = 0;
-	if (MapLoad(const_cast<char*>("sample.fmp"), 1)) return -5;
+	if (MapLoad(const_cast<char*>("level1.fmp"), 1)) return -5;
 	event_queue = al_create_event_queue();
 	timer = al_create_timer(1.0 / 60);
 	event_queue = al_create_event_queue();
@@ -73,9 +72,9 @@ int main(void)
 		{
 			render = true;
 			if (keys[UP])
-				;
+				player.UpdateSprites(WIDTH, HEIGHT, 3);
 			else if (keys[DOWN])
-				;
+				player.UpdateSprites(WIDTH, HEIGHT, 4);
 			else if (keys[LEFT])
 				player.UpdateSprites(WIDTH, HEIGHT, 0);
 			else if (keys[RIGHT])
@@ -110,9 +109,6 @@ int main(void)
 			case ALLEGRO_KEY_RIGHT:
 				keys[RIGHT] = true;
 				break;
-			case ALLEGRO_KEY_SPACE:
-				keys[SPACE] = true;
-				jump = 30;
 
 			}
 		}
@@ -134,9 +130,6 @@ int main(void)
 				break;
 			case ALLEGRO_KEY_RIGHT:
 				keys[RIGHT] = false;
-				break;
-			case ALLEGRO_KEY_SPACE:
-				keys[SPACE] = false;
 				break;
 			}
 		}
@@ -163,7 +156,6 @@ int main(void)
 
 			//draw foreground tiles
 			MapDrawFG(xOff, yOff, 0, 0, WIDTH, HEIGHT, 0);
-			jump = player.jumping(jump, JUMPIT);
 			player.DrawSprites(xOff, yOff);
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0, 0, 0));

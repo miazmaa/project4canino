@@ -31,6 +31,7 @@ void Sprite::UpdateSprites(int width, int height, int dir)
 {
 	int oldx = x;
 	int oldy = y;
+	animationDirection = dir;
 
 	if (dir == 1) { //right key
 		animationDirection = 1;
@@ -52,9 +53,20 @@ void Sprite::UpdateSprites(int width, int height, int dir)
 				curFrame = 1;
 		}
 	}
-	else //represent that they hit the space bar and that mean direction = 0
-		animationDirection = dir;
-
+	else if (dir == 3) { // UP
+		y -= 2;
+		if (++frameCount > frameDelay) {
+			frameCount = 0;
+			if (++curFrame > maxFrame) curFrame = 1;
+		}
+	}
+	else if (dir == 4) { // DOWN
+		y += 2;
+		if (++frameCount > frameDelay) {
+			frameCount = 0;
+			if (++curFrame > maxFrame) curFrame = 1;
+		}
+	}
 	//check for collided with foreground tiles
 	if (animationDirection == 0)
 	{
@@ -86,7 +98,7 @@ void Sprite::DrawSprites(int xoffset, int yoffset)
 	int fx = (curFrame % animationColumns) * frameWidth;
 	int fy = (curFrame / animationColumns) * frameHeight;
 
-	if (animationDirection == 1) {
+	if (animationDirection == 1 || animationDirection == 3 || animationDirection == 4) {
 		al_draw_bitmap_region(image, fx, fy, frameWidth, frameHeight, x - xoffset, y - yoffset, 0);
 	}
 	else if (animationDirection == 0) {
@@ -96,32 +108,4 @@ void Sprite::DrawSprites(int xoffset, int yoffset)
 		al_draw_bitmap_region(image, 0, 0, frameWidth, frameHeight, x - xoffset, y - yoffset, 0);
 
 	}
-}
-
-int Sprite::jumping(int jump, const int JUMPIT)
-{
-	//handle jumping
-	if (jump == JUMPIT) {
-		if (!collided(x + frameWidth / 2, y + frameHeight + 5))
-			jump = 0;
-	}
-	else
-	{
-		y -= jump / 3;
-		jump--;
-		curFrame = 0;
-	}
-
-	if (jump < 0)
-	{
-		if (collided(x + frameWidth / 2, y + frameHeight))
-		{
-			jump = JUMPIT;
-			while (collided(x + frameWidth / 2, y + frameHeight))
-			{
-				y -= 3;
-			}
-		}
-	}
-	return jump;
 }
