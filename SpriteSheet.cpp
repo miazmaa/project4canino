@@ -96,11 +96,17 @@ void Sprite::UpdateSprites(int width, int height, int dir)
 }
 
 bool Sprite::CollisionEndBlock()
-{
-	if (endValue(x + frameWidth / 2, y + frameHeight + 5))
-		return true;
+{ 
+	if (animationDirection == 1) { //if moving right
+		if (endValue(x + frameWidth + 1, y + frameHeight - 5))
+			return true;
+	}
 	else
-		return false;
+	{
+		if (endValue(x + (frameWidth / 2), y + frameHeight - 1))
+			return true;
+	}
+	return false;
 }
 
 void Sprite::DrawSprites(int xoffset, int yoffset)
