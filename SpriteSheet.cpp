@@ -20,7 +20,6 @@ void Sprite::InitSprites(int width, int height)
 	}
 	int boy_width = al_get_bitmap_width(image);
 	int boy_height = al_get_bitmap_height(image);
-	float scale = 0.5f;
 	maxFrame = 3;
 	curFrame = 0;
 	frameWidth = boy_width / 4;
@@ -29,7 +28,7 @@ void Sprite::InitSprites(int width, int height)
 	row = 0;
 	frameCount = 0;
 	frameDelay = 6;
-
+	scale = 0.5f;
 }
 
 void Sprite::UpdateSprites(int width, int height, int dir)
@@ -76,30 +75,38 @@ void Sprite::UpdateSprites(int width, int height, int dir)
 		curFrame = 0;
 	}
 	col = curFrame;
-	//check for collided with foreground tiles
-	if (animationDirection == 0)
-	{
-		if (collided(x, y + frameHeight)) { //collision detection to the left
-			x = oldx;
-			y = oldy;
-		}
+	int spritew = frameWidth * scale;
+	int spriteh = frameHeight * scale;
 
-	}
-	else if (animationDirection == 1)
+	int left = x;
+	int right = x + spritew - 1;
+	int top = y;
+	int bottom = y + spriteh - 1;
+
+	if (animationDirection == 0) //left
 	{
-		if (collided(x + frameWidth, y + frameHeight)) { //collision detection to the right
+		if (collided(left, top) || collided(left, bottom)) {
 			x = oldx;
 			y = oldy;
 		}
 	}
-	else if (animationDirection == 2) { // up
-		if (collided(x, y)) {
+	else if (animationDirection == 1) //right
+	{
+		if (collided(right, top) || collided(right, bottom)) {
 			x = oldx;
 			y = oldy;
 		}
 	}
-	else if (animationDirection == 3) { // down
-		if (collided(x, y + frameHeight)) {
+	else if (animationDirection == 2) //up
+	{
+		if (collided(left, top) || collided(right, top)) {
+			x = oldx;
+			y = oldy;
+		}
+	}
+	else if (animationDirection == 3) //down
+	{
+		if (collided(left, bottom) || collided(right, bottom)) {
 			x = oldx;
 			y = oldy;
 		}
@@ -108,13 +115,15 @@ void Sprite::UpdateSprites(int width, int height, int dir)
 
 bool Sprite::CollisionEndBlock()
 { 
-	return endValue(x + frameWidth / 2, y + frameHeight / 2);
+	int width = frameWidth * scale;
+	int height = frameHeight * scale;
+
+	return endValue(x + width / 2, y + height / 2);
 }
 
 void Sprite::DrawSprites(int xoffset, int yoffset)
 {
 	int fx = col * frameWidth;
 	int fy = row * frameHeight;
-	float scale = 0.5f;
 	al_draw_scaled_bitmap(image,fx, fy,frameWidth, frameHeight,x - xoffset, y - yoffset, frameWidth * scale, frameHeight * scale, 0 );
 }
