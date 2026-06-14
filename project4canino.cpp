@@ -20,7 +20,10 @@ int main(void)
 	int dir = -1;
 	//Player Variable
 	Sprite player;
-
+	bool paused = false;
+	bool gameOver = false;
+	int currentLevel = 1;
+	double pauseEndTime = 0;
 
 
 	//allegro variable
@@ -46,7 +49,12 @@ int main(void)
 
 	int xOff = 0;
 	int yOff = 0;
-	if (MapLoad(const_cast<char*>("level1.fmp"), 1)) return -5;
+	if (currentLevel == 1)                                      
+		MapLoad(const_cast<char*>("level1.fmp"), 1);           
+	else if (currentLevel == 2)
+		MapLoad(const_cast<char*>("level2.fmp"), 1);
+	else
+		MapLoad(const_cast<char*>("level3.fmp"), 1);
 	event_queue = al_create_event_queue();
 	timer = al_create_timer(1.0 / 60);
 
@@ -69,18 +77,43 @@ int main(void)
 		if (ev.type == ALLEGRO_EVENT_TIMER)
 		{
 			render = true;
-			if (keys[UP])
-				player.UpdateSprites(WIDTH, HEIGHT, 2);
-			else if (keys[DOWN])
-				player.UpdateSprites(WIDTH, HEIGHT, 3);
-			else if (keys[LEFT])
-				player.UpdateSprites(WIDTH, HEIGHT, 0);
-			else if (keys[RIGHT])
-				player.UpdateSprites(WIDTH, HEIGHT, 1);
-			else
-				player.UpdateSprites(WIDTH, HEIGHT, -1);
-			if (player.CollisionEndBlock())
-				cout << "Hit an End Block\n";
+			if (!paused)
+			{
+				if (keys[UP])
+					player.UpdateSprites(WIDTH, HEIGHT, 2);
+				else if (keys[DOWN])
+					player.UpdateSprites(WIDTH, HEIGHT, 3);
+				else if (keys[LEFT])
+					player.UpdateSprites(WIDTH, HEIGHT, 0);
+				else if (keys[RIGHT])
+					player.UpdateSprites(WIDTH, HEIGHT, 1);
+				else
+					player.UpdateSprites(WIDTH, HEIGHT, -1);
+			}
+			if (player.CollisionEndBlock() && !paused)
+			{
+				paused = true;
+				pauseEndTime = al_get_time() + 5.0; 
+			}
+			if (paused)                                      
+			{
+				if (al_get_time() >= pauseEndTime)             
+				{
+					paused = false;                           
+					currentLevel++; 
+
+					MapFreeMem();
+
+					if (currentLevel == 1)
+						MapLoad(const_cast<char*>("level1.fmp"), 1);
+					else if (currentLevel == 2)
+						MapLoad(const_cast<char*>("level2.fmp"), 1);
+					else if (currentLevel == 3)
+						MapLoad(const_cast<char*>("level3.fmp"), 1);
+					else
+						gameOver = true;  
+				}
+			}
 			render = true;
 
 		}
@@ -93,19 +126,19 @@ int main(void)
 			switch (ev.keyboard.keycode)
 			{
 			case ALLEGRO_KEY_ESCAPE:
-				done = true;
+				if (!paused) done = true;
 				break;
 			case ALLEGRO_KEY_UP:
-				keys[UP] = true;
+				if (!paused) keys[UP] = true;
 				break;
 			case ALLEGRO_KEY_DOWN:
-				keys[DOWN] = true;
+				if (!paused) keys[DOWN] = true;
 				break;
 			case ALLEGRO_KEY_LEFT:
-				keys[LEFT] = true;
+				if (!paused) keys[LEFT] = true;
 				break;
 			case ALLEGRO_KEY_RIGHT:
-				keys[RIGHT] = true;
+				if (!paused) keys[RIGHT] = true;
 				break;
 
 			}
@@ -117,7 +150,7 @@ int main(void)
 			case ALLEGRO_KEY_ESCAPE:
 				done = true;
 				break;
-			case ALLEGRO_KEY_UP:
+			case ALLEGRO_KEY_UP: 
 				keys[UP] = false;
 				break;
 			case ALLEGRO_KEY_DOWN:
@@ -157,6 +190,11 @@ int main(void)
 			player.DrawSprites(xOff, yOff);
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0, 0, 0));
+		}
+		if (gameOver)
+		{
+			al_rest(2.0);
+			done = true; 
 		}
 	}
 	MapFreeMem();
