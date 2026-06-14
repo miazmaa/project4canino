@@ -49,8 +49,6 @@ int main(void)
 	if (MapLoad(const_cast<char*>("level1.fmp"), 1)) return -5;
 	event_queue = al_create_event_queue();
 	timer = al_create_timer(1.0 / 60);
-	event_queue = al_create_event_queue();
-	timer = al_create_timer(1.0 / 60);
 
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
