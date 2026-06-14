@@ -37,29 +37,45 @@ void Sprite::UpdateSprites(int width, int height, int dir)
 	int oldx = x;
 	int oldy = y;
 
-	if (dir == 1) { //right key
+	if (dir == 1) { // right key
 		animationDirection = 1;
+		row = 3; 
 		x += 2;
-		if (++frameCount > frameDelay)
-		{
+		if (++frameCount > frameDelay) {
 			frameCount = 0;
-			if (++curFrame > maxFrame)
-				curFrame = 1;
+			if (++curFrame > maxFrame) curFrame = 0; 
 		}
 	}
-	else if (dir == 0) { //left key
+	else if (dir == 0) { // left key
 		animationDirection = 0;
+		row = 2; 
 		x -= 2;
-		if (++frameCount > frameDelay)
-		{
+		if (++frameCount > frameDelay) {
 			frameCount = 0;
-			if (++curFrame > maxFrame)
-				curFrame = 1;
+			if (++curFrame > maxFrame) curFrame = 0; 
 		}
 	}
-	else //represent that they hit the space bar and that mean direction = 0
-		animationDirection = dir;
-
+	else if (dir == 2) { //up 
+		animationDirection = 2;
+		row = 1;
+		y -= 2;
+		if (++frameCount > frameDelay) {
+			frameCount = 0;
+			if (++curFrame > maxFrame) curFrame = 0;
+		}
+	}
+	else if (dir == 3) { // down
+		animationDirection = 3;
+		row = 0;
+		y += 2;
+	}
+	else {
+		if (dir != -1) {
+			animationDirection = dir;
+		}
+		curFrame = 0;
+	}
+	col = curFrame;
 	//check for collided with foreground tiles
 	if (animationDirection == 0)
 	{
@@ -72,6 +88,18 @@ void Sprite::UpdateSprites(int width, int height, int dir)
 	else if (animationDirection == 1)
 	{
 		if (collided(x + frameWidth, y + frameHeight)) { //collision detection to the right
+			x = oldx;
+			y = oldy;
+		}
+	}
+	else if (animationDirection == 2) { // up
+		if (collided(x, y)) {
+			x = oldx;
+			y = oldy;
+		}
+	}
+	else if (animationDirection == 3) { // down
+		if (collided(x, y + frameHeight)) {
 			x = oldx;
 			y = oldy;
 		}
