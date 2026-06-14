@@ -104,7 +104,7 @@ void Sprite::UpdateSprites(int width, int height, int dir)
 			y = oldy;
 		}
 	}
-	else if (animationDirection == 3) //down
+	else if (animationDirection == 3) // down
 	{
 		if (collided(left, bottom) || collided(right, bottom)) {
 			x = oldx;
