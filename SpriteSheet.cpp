@@ -78,7 +78,7 @@ void Sprite::UpdateSprites(int width, int height, int dir)
 	int spritew = frameWidth * scale;
 	int spriteh = frameHeight * scale;
 
-	int left = x;
+	int left = x; //makes a rectangle around the player for collision, only way i could get it to work
 	int right = x + spritew - 1;
 	int top = y;
 	int bottom = y + spriteh - 1;

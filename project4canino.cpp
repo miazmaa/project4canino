@@ -91,7 +91,7 @@ int main(void)
 			render = true;
 			if (!paused)
 			{
-				double elapsed = al_get_time() - levelStartTime;
+				double elapsed = al_get_time() - levelStartTime; //for timer
 				timeLeft = LEVEL_TIME_LIMIT - elapsed;
 
 				if (timeLeft <= 0)
@@ -119,10 +119,10 @@ int main(void)
 				pauseEndTime = al_get_time() + 5.0; 
 			}
 			if (paused)                                      
-			{
+			{ //for advancing levels
 				if (al_get_time() >= pauseEndTime)             
 				{
-					paused = false;                           
+					paused = false;                
 					currentLevel++; 
 
 					MapFreeMem();
