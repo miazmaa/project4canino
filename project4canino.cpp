@@ -1,6 +1,8 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 #include "SpriteSheet.h"
 #include "mappy_A5.h"
 #include <iostream>
@@ -24,8 +26,10 @@ int main(void)
 	bool gameOver = false;
 	int currentLevel = 1;
 	double pauseEndTime = 0;
-
-
+	ALLEGRO_FONT* rubik = nullptr;
+	double levelStartTime = 0;
+	const double LEVEL_TIME_LIMIT = 60.0; 
+	double timeLeft = LEVEL_TIME_LIMIT;
 	//allegro variable
 	ALLEGRO_DISPLAY* display = NULL;
 	ALLEGRO_EVENT_QUEUE* event_queue = NULL;
@@ -44,17 +48,25 @@ int main(void)
 	al_install_keyboard();
 	al_init_image_addon();
 	al_init_primitives_addon();
+	al_init_font_addon();
+	al_init_ttf_addon();
+	rubik = al_load_ttf_font("rubik.ttf", 24, 0);
+	if (!rubik) {
+		cout << "Failed to load font!\n";
+		return -1;
+	}
 
 	player.InitSprites(WIDTH, HEIGHT);
 
 	int xOff = 0;
 	int yOff = 0;
-	if (currentLevel == 1)                                      
-		MapLoad(const_cast<char*>("level1.fmp"), 1);           
+	if (currentLevel == 1)
+		MapLoad(const_cast<char*>("level1.fmp"), 1);
 	else if (currentLevel == 2)
 		MapLoad(const_cast<char*>("level2.fmp"), 1);
 	else
 		MapLoad(const_cast<char*>("level3.fmp"), 1);
+	levelStartTime = al_get_time();
 	event_queue = al_create_event_queue();
 	timer = al_create_timer(1.0 / 60);
 
@@ -77,6 +89,17 @@ int main(void)
 		if (ev.type == ALLEGRO_EVENT_TIMER)
 		{
 			render = true;
+			if (!paused)
+			{
+				double elapsed = al_get_time() - levelStartTime;
+				timeLeft = LEVEL_TIME_LIMIT - elapsed;
+
+				if (timeLeft <= 0)
+				{
+					gameOver = true;
+					done = true; // window closes
+				}
+			}
 			if (!paused)
 			{
 				if (keys[UP])
@@ -112,6 +135,7 @@ int main(void)
 						MapLoad(const_cast<char*>("level3.fmp"), 1);
 					else
 						gameOver = true;  
+					levelStartTime = al_get_time();
 				}
 			}
 			render = true;
@@ -188,8 +212,16 @@ int main(void)
 			//draw foreground tiles
 			MapDrawFG(xOff, yOff, 0, 0, WIDTH, HEIGHT, 0);
 			player.DrawSprites(xOff, yOff);
+			al_draw_filled_rectangle(10, 10, 180, 45, al_map_rgb(0, 0, 0));
+			al_draw_textf(rubik, al_map_rgb(255, 255, 255), 20, 15, 0, "Time: %d", (int)timeLeft);
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0, 0, 0));
+			if (!gameOver)
+			{
+				double elapsed = al_get_time() - levelStartTime;
+				timeLeft = LEVEL_TIME_LIMIT - elapsed;
+				if (timeLeft < 0) timeLeft = 0;
+			}
 		}
 		if (gameOver)
 		{
